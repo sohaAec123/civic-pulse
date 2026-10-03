@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicPulse — Community Needs Prioritization Bulletin</title>
+  <meta name="description" content="CivicPulse helps identify which community problems should be prioritized when resources are limited.">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom Newsprint Design System Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="antialiased selection:bg-red-700 selection:text-white">
+
+  <!-- TOP EDITORIAL TICKER BAR -->
+  <div class="bg-black text-white text-xs font-mono-meta py-1.5 px-4 border-b-2 border-black flex justify-between items-center flex-wrap gap-2">
+    <div class="flex items-center gap-3">
+      <span class="editorial-stamp text-[10px] py-0.5 px-1.5 bg-red-700">BULLETIN N° 104</span>
+      <span class="tracking-wider">CIVIC INTELLIGENCE DISPATCH</span>
+      <span class="hidden md:inline text-gray-400">•</span>
+      <span class="hidden md:inline tracking-wider" id="headerDateText">OCTOBER 2026</span>
+    </div>
+    <div class="flex items-center gap-3 text-[11px]">
+      <span class="inline-flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ink-pulse"></span>
+        <span class="text-emerald-400 font-bold uppercase tracking-wider">SYSTEM ACTIVE</span>
+      </span>
+      <span class="text-gray-400">|</span>
+      <span class="text-gray-300">FLASK BACKEND: <span class="text-yellow-400">READY FOR /api/prioritize</span></span>
+    </div>
+  </div>
+
+  <!-- MAIN NEWSPRINT MASTHEAD HEADER & NAVIGATION -->
+  <header class="border-b-4 border-black bg-[#FAF8F5]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Edition Header Info -->
+      <div class="flex justify-between items-center text-xs font-mono-meta border-b border-black pb-2 mb-4 text-gray-700">
+        <div>VOL. 2026 • ISSUE 04</div>
+        <div class="font-bold tracking-widest hidden sm:block">THE COMMUNITY NEEDS PRIORITIZATION BULLETIN</div>
+        <div>PRICE: FREE CIVIC RESOURCE</div>
+      </div>
+
+      <!-- Main Logo Title -->
+      <div class="text-center my-3">
+        <a href="#" class="inline-block group">
+          <h1 class="font-headline text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight uppercase hover:text-red-700 transition-colors duration-200">
+            CivicPulse
+          </h1>
+        </a>
+        <p class="font-editorial italic text-lg sm:text-xl text-gray-800 mt-1 max-w-2xl mx-auto">
+          Identifying &amp; Prioritizing High-Impact Community Needs When Resources Are Limited.
+        </p>
+      </div>
+
+      <!-- Editorial Double Rule -->
+      <div class="editorial-rule-double"></div>
+
+      <!-- Navigation Bar -->
+      <nav class="flex flex-wrap items-center justify-between gap-4 pt-2">
+        <div class="flex items-center gap-6 font-ui text-sm font-bold tracking-wide uppercase">
+          <a href="#how-it-works" class="hover:text-red-700 hover:underline underline-offset-4 transition-all">How It Works</a>
+          <a href="#submit-form" class="hover:text-red-700 hover:underline underline-offset-4 transition-all">Submit A Need</a>
+          <a href="#examples" class="hover:text-red-700 hover:underline underline-offset-4 transition-all">Example Bulletins</a>
+          <a href="#about" class="hover:text-red-700 hover:underline underline-offset-4 transition-all">About</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="toggleJsonModal()" class="font-mono-meta text-xs border-2 border-black bg-white px-3 py-1.5 font-bold hover:bg-black hover:text-white transition-all newsprint-shadow-sm flex items-center gap-1.5">
+            <i data-lucide="code" class="w-3.5 h-3.5"></i>
+            FLASK API SPEC
+          </button>
+          <a href="#submit-form" class="editorial-stamp bg-red-700 hover:bg-black text-white px-4 py-1.5 font-ui text-xs font-bold uppercase tracking-wider newsprint-shadow-sm transition-all flex items-center gap-1">
+            REPORT A NEED <i data-lucide="arrow-down-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+    <!-- HERO SECTION -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-4">
+      
+      <!-- Main Column: Hero Article -->
+      <div class="lg:col-span-8 space-y-6 bg-[#FAF8F5] p-6 sm:p-8 newsprint-border-thick newsprint-shadow-lg flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="editorial-stamp bg-black text-white text-xs">LEAD EDITORIAL</span>
+            <span class="font-mono-meta text-xs font-bold text-red-700 uppercase tracking-widest">• SPECIAL REPORT</span>
+          </div>
+
+          <h2 class="font-headline text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-black">
+            What Does Your Community Need <span class="italic font-normal text-red-700 underline decoration-2 underline-offset-8">First</span>?
+          </h2>
+
+          <p class="font-editorial text-lg sm:text-xl text-gray-800 leading-relaxed pt-2 border-t border-black">
+            CivicPulse helps identify which community problems should be prioritized when resources are limited. By evaluating population scale, problem severity, recurrence frequency, and lack of alternatives, the system produces a clear, evidence-based priority index.
+          </p>
+        </div>
+
+        <div class="pt-6 border-t-2 border-black flex flex-wrap items-center justify-between gap-4">
+          <a href="#submit-form" class="newsprint-border-thick bg-red-700 hover:bg-black text-white font-ui font-black text-base uppercase tracking-wider px-6 py-3.5 newsprint-shadow newsprint-card-hover inline-flex items-center gap-2">
+            <span>PRIORITIZE A NEED NOW</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </a>
+
+          <div class="font-mono-meta text-xs text-gray-700 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-700"></i>
+            <span>No backend required to preview algorithm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side Column: Newspaper Editorial Sidebar / Key Metrics -->
+      <div class="lg:col-span-4 bg-[#FFFFFF] p-6 newsprint-border-thick newsprint-shadow flex flex-col justify-between space-y-6">
+        <div>
+          <div class="border-b-2 border-black pb-2 mb-4">
+            <h3 class="font-headline font-bold text-xl uppercase tracking-wide flex items-center gap-2">
+              <i data-lucide="newspaper" class="w-5 h-5 text-red-700"></i>
+              CIVIC INTELLIGENCE
+            </h3>
+            <span class="font-mono-meta text-[11px] text-gray-600 uppercase">METHODOLOGY HIGHLIGHT</span>
+          </div>
+
+          <div class="space-y-4">
+            <div class="border-b border-gray-300 pb-3">
+              <div class="font-mono-meta text-2xl font-black text-black">78%</div>
+              <p class="font-editorial text-xs text-gray-700">Of municipal requests suffer delayed action due to subjective priority scoring.</p>
+            </div>
+
+            <div class="border-b border-gray-300 pb-3">
+              <div class="font-mono-meta text-2xl font-black text-red-700">4-FACTOR MATRIX</div>
+              <p class="font-editorial text-xs text-gray-700">Severity, Frequency, Population Impact Scale, and Alternative Availability.</p>
+            </div>
+
+            <div>
+              <div class="font-mono-meta text-2xl font-black text-black">FLASK + GEMMA READY</div>
+              <p class="font-editorial text-xs text-gray-700">Structured JSON contract ready for Flask backend &amp; Gemma LLM rationale synthesis.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-100 p-4 border border-black font-mono-meta text-xs space-y-2">
+          <div class="font-bold uppercase text-red-700 flex items-center justify-between">
+            <span>FLASK TARGET:</span>
+            <span>POST /api/prioritize</span>
+          </div>
+          <div class="text-gray-700 text-[11px] font-mono leading-tight">
+            Payload format: JSON object with 6 standardized priority indicators.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- HOW IT WORKS SECTION -->
+    <section id="how-it-works" class="space-y-6 pt-4">
+      <div class="border-b-4 border-black pb-3 flex flex-wrap justify-between items-end gap-2">
+        <div>
+          <span class="editorial-stamp bg-black text-white text-xs mb-1">PROCESS SPECIFICATION</span>
+          <h2 class="font-headline text-3xl sm:text-4xl font-extrabold uppercase">How CivicPulse Works</h2>
+        </div>
+        <span class="font-mono-meta text-xs font-bold text-gray-600">3-STEP PRIORITY FRAMEWORK</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Step 1 -->
+        <div class="bg-[#FAF8F5] p-6 newsprint-border-thick newsprint-shadow newsprint-card-hover space-y-4 relative">
+          <div class="flex justify-between items-start border-b-2 border-black pb-3">
+            <span class="font-mono-meta text-4xl font-black text-red-700">01</span>
+            <div class="p-2 bg-black text-white">
+              <i data-lucide="file-text" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <h3 class="font-headline text-xl font-bold uppercase">REPORT</h3>
+          <p class="font-editorial text-sm text-gray-800 leading-relaxed">
+            Community members or officials submit detailed information about an unaddressed civic issue—ranging from contaminated drinking water to broken streetlights or ruined roadways.
+          </p>
+          <div class="font-mono-meta text-xs text-gray-600 pt-2 border-t border-dashed border-gray-400">
+            Input: Title, Category &amp; Impact Metrics
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-[#FAF8F5] p-6 newsprint-border-thick newsprint-shadow newsprint-card-hover space-y-4 relative">
+          <div class="flex justify-between items-start border-b-2 border-black pb-3">
+            <span class="font-mono-meta text-4xl font-black text-red-700">02</span>
+            <div class="p-2 bg-black text-white">
+              <i data-lucide="cpu" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <h3 class="font-headline text-xl font-bold uppercase">ANALYZE</h3>
+          <p class="font-editorial text-sm text-gray-800 leading-relaxed">
+            The evaluation algorithm cross-examines multiple critical vectors: total citizens affected, severity degree, frequency of exposure, and whether a viable alternative service exists.
+          </p>
+          <div class="font-mono-meta text-xs text-gray-600 pt-2 border-t border-dashed border-gray-400">
+            Engine: Weighted Priority Algorithm &amp; Gemma LLM
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-[#FAF8F5] p-6 newsprint-border-thick newsprint-shadow newsprint-card-hover space-y-4 relative">
+          <div class="flex justify-between items-start border-b-2 border-black pb-3">
+            <span class="font-mono-meta text-4xl font-black text-red-700">03</span>
+            <div class="p-2 bg-black text-white">
+              <i data-lucide="shield-alert" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <h3 class="font-headline text-xl font-bold uppercase">PRIORITIZE</h3>
+          <p class="font-editorial text-sm text-gray-800 leading-relaxed">
+            Receive an objective Priority Score (0–100), urgency level, structured key factors, AI rationale narrative, and recommended municipal intervention steps.
+          </p>
+          <div class="font-mono-meta text-xs text-gray-600 pt-2 border-t border-dashed border-gray-400">
+            Output: Actionable Priority Dispatch
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PROBLEM SUBMISSION FORM SECTION -->
+    <section id="submit-form" class="space-y-6 pt-4">
+      <div class="border-b-4 border-black pb-3 flex flex-wrap justify-between items-end gap-2">
+        <div>
+          <span class="editorial-stamp bg-red-700 text-white text-xs mb-1">OFFICIAL REGISTRATION</span>
+          <h2 class="font-headline text-3xl sm:text-4xl font-extrabold uppercase">Submit A Community Need</h2>
+        </div>
+        <span class="font-mono-meta text-xs font-bold text-gray-600">FORM REF: CP-2026-REG</span>
+      </div>
+
+      <!-- Form Container -->
+      <div class="bg-[#FAF8F5] p-6 sm:p-10 newsprint-border-heavy newsprint-shadow-lg">
+        
+        <form id="problemForm" class="space-y-8" novalidate>
+          
+          <!-- Section 1: Core Problem Details -->
+          <div class="space-y-6 border-b-2 border-black pb-6">
+            <div class="flex items-center gap-2">
+              <span class="font-mono-meta text-xs font-bold bg-black text-white px-2 py-0.5">SECTION A</span>
+              <h3 class="font-headline text-lg font-bold uppercase">Problem Overview &amp; Category</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+              
+              <!-- Title Input -->
+              <div class="md:col-span-7 space-y-2">
+                <label for="problemTitle" class="block font-ui text-sm font-bold uppercase tracking-wider text-black">
+                  Problem Title <span class="text-red-600">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="problemTitle" 
+                  name="problemTitle"
+                  placeholder="e.g., Contaminated Drinking Water Supply in Ward 4 Market"
+                  class="newsprint-input w-full font-ui text-base"
+                  required
+                >
+                <p class="font-editorial text-xs text-gray-600">Provide a clear, descriptive headline of the civic issue.</p>
+              </div>
+
+              <!-- Category Input -->
+              <div class="md:col-span-5 space-y-2">
+                <label for="problemCategory" class="block font-ui text-sm font-bold uppercase tracking-wider text-black">
+                  Problem Category <span class="text-red-600">*</span>
+                </label>
+                <select id="problemCategory" name="problemCategory" class="newsprint-select w-full font-ui text-base" required>
+                  <option value="" disabled selected>Select Category...</option>
+                  <option value="Roads">Roads &amp; Transport</option>
+                  <option value="Water">Water &amp; Sanitation</option>
+                  <option value="Drainage">Drainage &amp; Flood Control</option>
+                  <option value="Healthcare">Healthcare Facilities</option>
+                  <option value="Education">Education &amp; Schools</option>
+                  <option value="Streetlights">Streetlights &amp; Lighting</option>
+                  <option value="Public Safety">Public Safety &amp; Security</option>
+                  <option value="Other">Other Community Need</option>
+                </select>
+                <p class="font-editorial text-xs text-gray-600">Select primary sector impacted.</p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Section 2: Impact Metrics & Severity -->
+          <div class="space-y-6 border-b-2 border-black pb-6">
+            <div class="flex items-center gap-2">
+              <span class="font-mono-meta text-xs font-bold bg-black text-white px-2 py-0.5">SECTION B</span>
+              <h3 class="font-headline text-lg font-bold uppercase">Impact Scale, Severity &amp; Frequency</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+              
+              <!-- People Affected -->
+              <div class="md:col-span-4 space-y-2">
+                <label for="peopleAffected" class="block font-ui text-sm font-bold uppercase tracking-wider text-black">
+                  Number of People Affected <span class="text-red-600">*</span>
+                </label>
+                <input 
+                  type="number" 
+                  id="peopleAffected" 
+                  name="peopleAffected"
+                  min="1"
+                  placeholder="e.g., 2500"
+                  class="newsprint-input w-full font-mono-meta text-base"
+                  required
+                >
+                <p class="font-editorial text-xs text-gray-600">Estimated number of impacted citizens.</p>
+              </div>
+
+              <!-- Frequency Option Selector -->
+              <div class="md:col-span-8 space-y-2">
+                <label class="block font-ui text-sm font-bold uppercase tracking-wider text-black">
+                  Frequency of Occurrence <span class="text-red-600">*</span>
+                </label>
+                <input type="hidden" id="frequencyInput" name="frequency" value="">
+                
+                <div id="frequencyGroup" class="grid grid-cols-3 gap-3">
+                  <button type="button" data-value="Daily" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    DAILY
+                  </button>
+                  <button type="button" data-value="Weekly" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    WEEKLY
+                  </button>
+                  <button type="button" data-value="Occasionally" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    OCCASIONALLY
+                  </button>
+                </div>
+                <p class="font-editorial text-xs text-gray-600">How often does this problem cause disruption?</p>
+              </div>
+
+            </div>
+
+            <!-- Severity & Alternative -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 pt-2">
+              
+              <!-- Severity Level -->
+              <div class="md:col-span-6 space-y-2">
+                <label class="block font-ui text-sm font-bold uppercase tracking-wider text-black">
+                  Severity Level <span class="text-red-600">*</span>
+                </label>
+                <input type="hidden" id="severityInput" name="severity" value="">
+
+                <div id="severityGroup" class="grid grid-cols-3 gap-3">
+                  <button type="button" data-value="Low" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    LOW
+                  </button>
+                  <button type="button" data-value="Medium" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    MEDIUM
+                  </button>
+                  <button type="button" data-value="High" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    HIGH
+                  </button>
+                </div>
+                <p class="font-editorial text-xs text-gray-600">Low: Minor inconvenience | High: Severe safety/health threat.</p>
+              </div>
+
+              <!-- Alternative Available -->
+              <div class="md:col-span-6 space-y-2">
+                <label class="block font-ui text-sm font-bold uppercase tracking-wider text-black">
+                  Is a Viable Alternative Available? <span class="text-red-600">*</span>
+                </label>
+                <input type="hidden" id="alternativeInput" name="alternative" value="">
+
+                <div id="alternativeGroup" class="grid grid-cols-2 gap-3">
+                  <button type="button" data-value="Yes" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    YES (AVAILABLE)
+                  </button>
+                  <button type="button" data-value="No" class="option-btn font-ui text-sm font-bold py-3 px-2 text-center border-2 border-black bg-white hover:bg-gray-100 transition-all">
+                    NO (NONE)
+                  </button>
+                </div>
+                <p class="font-editorial text-xs text-gray-600">Can affected citizens use a temporary alternative road, water source, or facility?</p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Form Submit Button -->
+          <div class="pt-2 flex flex-wrap items-center justify-between gap-4">
+            <div class="font-mono-meta text-xs text-gray-600">
+              <span class="text-red-700 font-bold">*</span> All fields mandatory for priority index evaluation.
+            </div>
+
+            <button 
+              type="submit" 
+              id="submitBtn"
+              class="newsprint-border-thick bg-red-700 hover:bg-black text-white font-ui font-black text-lg uppercase tracking-wider px-8 py-4 newsprint-shadow newsprint-card-hover transition-all flex items-center gap-3"
+            >
+              <span>PRIORITIZE THIS NEED</span>
+              <i data-lucide="award" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- PRIORITY RESULT SECTION (HIDDEN INITIALLY, SHOWN UPON SUBMIT) -->
+    <section id="resultSection" class="hidden space-y-6 pt-4">
+      <div class="border-b-4 border-black pb-3 flex flex-wrap justify-between items-end gap-2">
+        <div>
+          <span class="editorial-stamp bg-red-700 text-white text-xs mb-1">DISPATCH EVALUATION RESULT</span>
+          <h2 class="font-headline text-3xl sm:text-4xl font-extrabold uppercase">Priority Index Assessment</h2>
+        </div>
+        <span class="font-mono-meta text-xs font-bold text-gray-600" id="resTimestamp">OFFICIAL EVALUATION</span>
+      </div>
+
+      <!-- Result Card Container -->
+      <div class="bg-[#FAF8F5] p-6 sm:p-8 newsprint-border-heavy newsprint-shadow-lg space-y-8">
+        
+        <!-- Result Header Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-6 border-b-2 border-black pb-6">
+          <div class="space-y-1">
+            <span class="font-mono-meta text-xs uppercase tracking-widest text-gray-600">TARGET ISSUE</span>
+            <h3 class="font-headline text-2xl sm:text-3xl font-extrabold text-black" id="resProblemTitle">Problem Title Placeholder</h3>
+            <div class="flex items-center gap-3 font-mono-meta text-xs text-gray-700">
+              <span>CATEGORY: <strong id="resCategoryHeader" class="text-black uppercase">Category</strong></span>
+              <span>•</span>
+              <span>IMPACT: <strong id="resPeopleCount" class="text-black">0</strong> CITIZENS</span>
+            </div>
+          </div>
+
+          <!-- Score & Priority Badge -->
+          <div class="bg-white p-4 newsprint-border text-center min-w-[200px] space-y-1">
+            <div class="font-mono-meta text-xs font-bold text-gray-600 uppercase">PRIORITY SCORE</div>
+            <div class="font-headline text-5xl font-black text-black" id="resPriorityScore">00/100</div>
+            <div id="resLevelBadge" class="editorial-stamp px-3 py-1 text-xs font-bold">
+              <span id="resPriorityLevel">ASSESSING...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Problem Summary Breakdown Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white p-4 newsprint-border font-mono-meta text-xs">
+          <div>
+            <span class="text-gray-500 block uppercase text-[10px]">CATEGORY</span>
+            <strong id="resCategoryGrid" class="text-black text-sm uppercase">--</strong>
+          </div>
+          <div>
+            <span class="text-gray-500 block uppercase text-[10px]">FREQUENCY</span>
+            <strong id="resFrequency" class="text-black text-sm uppercase">--</strong>
+          </div>
+          <div>
+            <span class="text-gray-500 block uppercase text-[10px]">SEVERITY</span>
+            <strong id="resSeverity" class="text-black text-sm uppercase">--</strong>
+          </div>
+          <div>
+            <span class="text-gray-500 block uppercase text-[10px]">ALTERNATIVE</span>
+            <strong id="resAlternative" class="text-black text-sm uppercase">--</strong>
+          </div>
+        </div>
+
+        <!-- Key Factors Grid -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2 border-b border-black pb-1">
+            <i data-lucide="sliders" class="w-4 h-4 text-red-700"></i>
+            <h4 class="font-headline font-bold text-base uppercase">Evaluated Key Factors</h4>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div class="bg-white p-3 newsprint-border space-y-1">
+              <span class="font-mono-meta text-[10px] text-gray-500 uppercase block">FACTOR 01: SEVERITY</span>
+              <p class="font-ui text-xs font-bold text-black" id="resFactorSeverity">Severity Impact</p>
+            </div>
+
+            <div class="bg-white p-3 newsprint-border space-y-1">
+              <span class="font-mono-meta text-[10px] text-gray-500 uppercase block">FACTOR 02: FREQUENCY</span>
+              <p class="font-ui text-xs font-bold text-black" id="resFactorFrequency">Frequency Rate</p>
+            </div>
+
+            <div class="bg-white p-3 newsprint-border space-y-1">
+              <span class="font-mono-meta text-[10px] text-gray-500 uppercase block">FACTOR 03: POPULATION SCALE</span>
+              <p class="font-ui text-xs font-bold text-black" id="resFactorPeople">Population Impact</p>
+            </div>
+
+            <div class="bg-white p-3 newsprint-border space-y-1">
+              <span class="font-mono-meta text-[10px] text-gray-500 uppercase block">FACTOR 04: ALTERNATIVE</span>
+              <p class="font-ui text-xs font-bold text-black" id="resFactorAlternative">Alternative Status</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- AI Generated Explanation (Gemma Rationale Preview) -->
+        <div class="bg-white p-6 newsprint-border space-y-3">
+          <div class="flex justify-between items-center border-b border-black pb-2">
+            <div class="flex items-center gap-2">
+              <span class="editorial-stamp bg-black text-white text-[10px]">AI ENGINE</span>
+              <h4 class="font-headline font-bold text-base uppercase">Gemma Assessment Rationale</h4>
+            </div>
+            <span class="font-mono-meta text-[11px] text-gray-500">MOCK AI PREVIEW</span>
+          </div>
+
+          <p id="resAIExplanation" class="font-editorial text-base text-gray-900 leading-relaxed italic">
+            AI Explanation loading...
+          </p>
+        </div>
+
+        <!-- Recommended Action Roadmap -->
+        <div class="bg-red-50 p-6 newsprint-border border-red-700 space-y-3">
+          <div class="flex items-center gap-2 border-b border-red-700 pb-2">
+            <i data-lucide="check-square" class="w-5 h-5 text-red-700"></i>
+            <h4 class="font-headline font-bold text-base uppercase text-red-900">Recommended Action Roadmap</h4>
+          </div>
+
+          <div id="resRecommendedAction" class="font-mono-meta text-xs text-gray-900 leading-relaxed whitespace-pre-line font-medium">
+            Recommended actions loading...
+          </div>
+        </div>
+
+        <!-- Developer Flask Endpoint Bar -->
+        <div class="bg-black text-white p-4 font-mono-meta text-xs flex flex-wrap justify-between items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">● FLASK INTEGRATION READY:</span>
+            <span class="text-gray-300">Payload ready for <code class="text-yellow-300 bg-gray-800 px-1 py-0.5">POST /api/prioritize</code></span>
+          </div>
+          
+          <button onclick="toggleJsonModal()" class="border border-white hover:bg-white hover:text-black px-3 py-1 font-bold transition-all text-xs flex items-center gap-1">
+            <i data-lucide="code" class="w-3.5 h-3.5"></i> INSPECT JSON PAYLOAD
+          </button>
+        </div>
+
+        <!-- Action Footer -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t-2 border-black">
+          <button 
+            onclick="resetFormAndResult()"
+            class="newsprint-border bg-white hover:bg-gray-100 text-black font-ui font-bold text-sm px-5 py-2.5 newsprint-shadow-sm transition-all flex items-center gap-2"
+          >
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            SUBMIT ANOTHER COMMUNITY NEED
+          </button>
+
+          <a href="#examples" class="font-mono-meta text-xs font-bold text-gray-700 hover:text-red-700 underline underline-offset-4">
+            View Editorial Example Bulletins →
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EXAMPLE PROBLEMS SECTION -->
+    <section id="examples" class="space-y-6 pt-4">
+      <div class="border-b-4 border-black pb-3 flex flex-wrap justify-between items-end gap-2">
+        <div>
+          <span class="editorial-stamp bg-black text-white text-xs mb-1">ARCHIVE CASE STUDIES</span>
+          <h2 class="font-headline text-3xl sm:text-4xl font-extrabold uppercase">Example Community Bulletins</h2>
+        </div>
+        <span class="font-mono-meta text-xs font-bold text-gray-600">CLICK TO LOAD PRESET</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <!-- Example 1: Drinking Water -->
+        <div class="bg-[#FAF8F5] p-5 newsprint-border-thick newsprint-shadow newsprint-card-hover flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center border-b border-black pb-2">
+              <span class="editorial-badge bg-red-700 text-white border-black">CRITICAL</span>
+              <span class="font-mono-meta text-xs font-bold">SCORE: 94</span>
+            </div>
+            <span class="font-mono-meta text-[11px] text-gray-600 uppercase block">CATEGORY: WATER</span>
+            <h3 class="font-headline text-lg font-bold leading-tight">Drinking Water Contamination in Ward 4</h3>
+            <p class="font-editorial text-xs text-gray-700">
+              2,800 residents facing daily toxic runoff contamination with no alternative clean well in 5km radius.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-dashed border-black">
+            <button class="load-example-btn w-full font-ui text-xs font-bold py-2 px-3 border-2 border-black bg-white hover:bg-black hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <span>LOAD INTO FORM</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Example 2: Streetlights -->
+        <div class="bg-[#FAF8F5] p-5 newsprint-border-thick newsprint-shadow newsprint-card-hover flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center border-b border-black pb-2">
+              <span class="editorial-badge bg-yellow-400 text-black border-black">MEDIUM</span>
+              <span class="font-mono-meta text-xs font-bold">SCORE: 58</span>
+            </div>
+            <span class="font-mono-meta text-[11px] text-gray-600 uppercase block">CATEGORY: STREETLIGHTS</span>
+            <h3 class="font-headline text-lg font-bold leading-tight">Broken Lighting on Main Commercial Boulevard</h3>
+            <p class="font-editorial text-xs text-gray-700">
+              950 citizens affected by total darkness on night market avenue. Alternative lighted bypass available.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-dashed border-black">
+            <button class="load-example-btn w-full font-ui text-xs font-bold py-2 px-3 border-2 border-black bg-white hover:bg-black hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <span>LOAD INTO FORM</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Example 3: Poor Roads -->
+        <div class="bg-[#FAF8F5] p-5 newsprint-border-thick newsprint-shadow newsprint-card-hover flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center border-b border-black pb-2">
+              <span class="editorial-badge bg-amber-500 text-black border-black">HIGH</span>
+              <span class="font-mono-meta text-xs font-bold">SCORE: 82</span>
+            </div>
+            <span class="font-mono-meta text-[11px] text-gray-600 uppercase block">CATEGORY: ROADS</span>
+            <h3 class="font-headline text-lg font-bold leading-tight">Pothole Ridge on School Transit Bus Route</h3>
+            <p class="font-editorial text-xs text-gray-700">
+              3,400 daily commuters &amp; school buses experiencing vehicle damage and severe delays. No alternate paved route.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-dashed border-black">
+            <button class="load-example-btn w-full font-ui text-xs font-bold py-2 px-3 border-2 border-black bg-white hover:bg-black hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <span>LOAD INTO FORM</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Example 4: Drainage -->
+        <div class="bg-[#FAF8F5] p-5 newsprint-border-thick newsprint-shadow newsprint-card-hover flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center border-b border-black pb-2">
+              <span class="editorial-badge bg-red-700 text-white border-black">CRITICAL</span>
+              <span class="font-mono-meta text-xs font-bold">SCORE: 89</span>
+            </div>
+            <span class="font-mono-meta text-[11px] text-gray-600 uppercase block">CATEGORY: DRAINAGE</span>
+            <h3 class="font-headline text-lg font-bold leading-tight">Monsoon Sewage Overflow in South Suburb</h3>
+            <p class="font-editorial text-xs text-gray-700">
+              4,100 residents suffering stagnant floodwater entering homes during weekly monsoon downpours.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-dashed border-black">
+            <button class="load-example-btn w-full font-ui text-xs font-bold py-2 px-3 border-2 border-black bg-white hover:bg-black hover:text-white transition-all flex items-center justify-center gap-1.5">
+              <span>LOAD INTO FORM</span>
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="bg-[#FAF8F5] p-6 sm:p-8 newsprint-border-thick newsprint-shadow space-y-4">
+      <div class="border-b-2 border-black pb-2">
+        <span class="editorial-stamp bg-black text-white text-xs">MISSION STATEMENT</span>
+        <h2 class="font-headline text-2xl font-extrabold uppercase mt-1">About CivicPulse</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-8 font-editorial text-base text-gray-800 leading-relaxed space-y-3">
+          <p>
+            When municipal resources and public budgets are constrained, every delay in addressing urgent community needs leads to compounded public hardship. Traditional grievance portals process requests on a first-come basis rather than objective urgency.
+          </p>
+          <p>
+            <strong>CivicPulse</strong> introduces a transparent, data-driven prioritization standard. By quantifying severity, population scale, exposure frequency, and alternative availability, CivicPulse empowers leaders to allocate resources where they save the most lives and mitigate the greatest harm first.
+          </p>
+        </div>
+
+        <div class="md:col-span-4 bg-white p-4 newsprint-border font-mono-meta text-xs space-y-3">
+          <div class="font-bold border-b border-black pb-1">HACKATHON ARCHITECTURE</div>
+          <div class="flex justify-between text-gray-600">
+            <span>Frontend:</span>
+            <span class="text-black font-bold">HTML5 / Tailwind / Vanilla JS</span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Design Standard:</span>
+            <span class="text-black font-bold">Newsprint Editorial UI</span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Backend Integration:</span>
+            <span class="text-red-700 font-bold">Flask + Gemma LLM Ready</span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Endpoint:</span>
+            <span class="text-black font-mono">POST /api/prioritize</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- DEVELOPER JSON PAYLOAD MODAL -->
+  <div id="jsonOutputModal" class="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-[#FAF8F5] max-w-2xl w-full newsprint-border-heavy newsprint-shadow-lg p-6 space-y-4 relative">
+      <div class="flex justify-between items-center border-b-2 border-black pb-3">
+        <div class="flex items-center gap-2">
+          <span class="editorial-stamp bg-black text-white text-xs">FLASK SPEC</span>
+          <h3 class="font-headline font-extrabold text-xl uppercase">Target JSON Payload</h3>
+        </div>
+        <button onclick="toggleJsonModal()" class="text-black hover:text-red-700 font-mono-meta font-bold text-lg p-1">
+          ✕
+        </button>
+      </div>
+
+      <p class="font-editorial text-xs text-gray-700">
+        Below is the exact JSON structure sent from this frontend to the Flask endpoint <code class="bg-gray-200 px-1 py-0.5 text-black font-mono">POST /api/prioritize</code>:
+      </p>
+
+      <div class="bg-black text-emerald-400 p-4 font-mono-meta text-xs overflow-x-auto max-h-72 border-2 border-black newsprint-shadow-sm">
+        <pre id="jsonPayloadCode">{
+  "title": "Contaminated Well Water in Ward 4 Market",
+  "category": "Water",
+  "people_affected": 2800,
+  "frequency": "Daily",
+  "severity": "High",
+  "alternative_available": false,
+  "timestamp": "2026-10-03T11:00:00.000Z"
+}</pre>
+      </div>
+
+      <div class="pt-2 flex justify-between items-center font-mono-meta text-xs">
+        <span class="text-gray-600">Ready for Flask <code class="text-black font-bold">request.get_json()</code></span>
+        <button onclick="toggleJsonModal()" class="bg-black text-white px-4 py-2 font-bold hover:bg-red-700 transition-colors">
+          CLOSE WINDOW
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWSPRINT FOOTER -->
+  <footer class="border-t-4 border-black bg-[#FAF8F5] mt-20 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        
+        <!-- Footer Column 1: Logo & Tagline -->
+        <div class="md:col-span-6 space-y-3">
+          <h2 class="font-headline text-4xl font-black uppercase tracking-tight">CivicPulse</h2>
+          <p class="font-editorial italic text-lg text-gray-800">
+            "From community problems to actionable priorities."
+          </p>
+          <p class="font-editorial text-xs text-gray-600 max-w-md">
+            An open civic intelligence platform helping local governments, community leaders, and citizen advocacy groups prioritize critical infrastructure &amp; public safety needs.
+          </p>
+        </div>
+
+        <!-- Footer Column 2: Navigation & Metadata -->
+        <div class="md:col-span-3 space-y-2 font-ui text-xs font-bold uppercase tracking-wider">
+          <div class="border-b border-black pb-1 mb-2 font-mono-meta text-gray-500">NAVIGATION</div>
+          <div><a href="#how-it-works" class="hover:text-red-700">How It Works</a></div>
+          <div><a href="#submit-form" class="hover:text-red-700">Submit A Need</a></div>
+          <div><a href="#examples" class="hover:text-red-700">Example Bulletins</a></div>
+          <div><a href="#about" class="hover:text-red-700">About CivicPulse</a></div>
+        </div>
+
+        <!-- Footer Column 3: Edition info -->
+        <div class="md:col-span-3 space-y-2 font-mono-meta text-xs">
+          <div class="border-b border-black pb-1 mb-2 text-gray-500">METADATA</div>
+          <div>EDITION: <span class="font-bold text-black">HACKATHON RELEASE v1.0</span></div>
+          <div>FLASK READY: <span class="font-bold text-emerald-700">YES</span></div>
+          <div>DESIGN: <span class="font-bold text-black">NEWSPRINT SYSTEM</span></div>
+          <div class="pt-2">
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="border-2 border-black bg-white px-3 py-1 font-bold hover:bg-black hover:text-white transition-all flex items-center gap-1">
+              <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i> BACK TO TOP
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Double Rule -->
+      <div class="editorial-rule-double"></div>
+
+      <!-- Footer Copyright Bar -->
+      <div class="flex flex-wrap justify-between items-center text-xs font-mono-meta text-gray-700 gap-2">
+        <div>© 2026 CIVICPULSE • COMMUNITY NEEDS PRIORITIZATION PLATFORM</div>
+        <div>DESIGNED FOR FLASK &amp; GEMMA INTEGRATION</div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Application Controller JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>

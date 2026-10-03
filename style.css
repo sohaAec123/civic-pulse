@@ -1,0 +1,197 @@
+/* Newsprint Design System - CivicPulse */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,400;1,700&display=swap');
+
+:root {
+  --newsprint-bg: #F5F2EB;
+  --newsprint-card: #FAF8F5;
+  --newsprint-border: #121212;
+  --newsprint-ink: #121212;
+  --newsprint-muted: #5A5853;
+  --newsprint-red: #C8102E;
+  --newsprint-red-hover: #9E0B22;
+  --newsprint-yellow: #E6AA1C;
+  --newsprint-green: #2B7A4B;
+  --newsprint-grid: rgba(18, 18, 18, 0.08);
+}
+
+body {
+  background-color: var(--newsprint-bg);
+  color: var(--newsprint-ink);
+  font-family: 'Inter', sans-serif;
+  background-image: 
+    radial-gradient(var(--newsprint-grid) 1px, transparent 1px);
+  background-size: 16px 16px;
+  min-height: 100vh;
+}
+
+/* Custom Typography Utility Classes */
+.font-headline {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-editorial {
+  font-family: 'Lora', Georgia, serif;
+}
+
+.font-ui {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.font-mono-meta {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Mandatory Zero Border Radius for Newsprint System */
+* {
+  border-radius: 0px !important;
+}
+
+/* Newsprint Borders & Shadows */
+.newsprint-border {
+  border: 2px solid var(--newsprint-border);
+}
+
+.newsprint-border-thick {
+  border: 3px solid var(--newsprint-border);
+}
+
+.newsprint-border-heavy {
+  border: 4px solid var(--newsprint-border);
+}
+
+.newsprint-shadow {
+  box-shadow: 4px 4px 0px var(--newsprint-border);
+}
+
+.newsprint-shadow-lg {
+  box-shadow: 6px 6px 0px var(--newsprint-border);
+}
+
+.newsprint-shadow-sm {
+  box-shadow: 2px 2px 0px var(--newsprint-border);
+}
+
+.newsprint-card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.newsprint-card-hover:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px var(--newsprint-border);
+}
+
+.newsprint-button-active:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--newsprint-border);
+}
+
+/* Newsprint Decorative Lines */
+.editorial-rule-double {
+  border-top: 3px double var(--newsprint-border);
+  border-bottom: 1px solid var(--newsprint-border);
+  height: 6px;
+  margin: 1rem 0;
+}
+
+.editorial-rule-single {
+  border-top: 2px solid var(--newsprint-border);
+}
+
+.editorial-rule-dashed {
+  border-top: 2px dashed var(--newsprint-border);
+}
+
+/* Newsprint Stamp Tag */
+.editorial-stamp {
+  background-color: var(--newsprint-red);
+  color: #FFFFFF;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  display: inline-block;
+  border: 1px solid var(--newsprint-border);
+}
+
+.editorial-badge {
+  border: 1.5px solid var(--newsprint-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  text-transform: uppercase;
+}
+
+/* Radio & Select Custom Styling for Newsprint aesthetic */
+.newsprint-input {
+  background-color: #FFFFFF;
+  border: 2px solid var(--newsprint-border);
+  color: var(--newsprint-ink);
+  font-family: 'Inter', sans-serif;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.newsprint-input:focus {
+  border-color: var(--newsprint-red);
+  box-shadow: 3px 3px 0px var(--newsprint-border);
+}
+
+.newsprint-select {
+  background-color: #FFFFFF;
+  border: 2px solid var(--newsprint-border);
+  color: var(--newsprint-ink);
+  padding: 0.75rem 1rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23121212' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+}
+
+/* Custom Radio Card Selectors */
+.newsprint-option-card {
+  border: 2px solid var(--newsprint-border);
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.newsprint-option-card:hover {
+  background: #FAF8F5;
+  box-shadow: 3px 3px 0px var(--newsprint-border);
+}
+
+.newsprint-option-card.selected {
+  background: #121212;
+  color: #FFFFFF;
+  box-shadow: 4px 4px 0px var(--newsprint-red);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--newsprint-bg);
+  border-left: 2px solid var(--newsprint-border);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--newsprint-border);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--newsprint-red);
+}
+
+/* Pulse indicator animation */
+@keyframes ink-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.animate-ink-pulse {
+  animation: ink-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
