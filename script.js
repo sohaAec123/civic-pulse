@@ -1,1256 +1,416 @@
-/**
- * CivicPulse - Community Needs Prioritization Platform
- * Frontend Controller + Flask Backend Integration
- */
-
-document.addEventListener('DOMContentLoaded', () => {
-
-  // Initialize Lucide icons if loaded
-  if (window.lucide) {
-    window.lucide.createIcons();
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
   }
 
-  // Element selectors
-  const problemForm = document.getElementById('problemForm');
-  const resultSection = document.getElementById('resultSection');
-  const jsonOutputModal = document.getElementById('jsonOutputModal');
-  const jsonPayloadCode = document.getElementById('jsonPayloadCode');
+  const form = document.getElementById("problemForm");
+  const resultSection = document.getElementById("resultSection");
+  const submitBtn = document.getElementById("submitBtn");
+  const frequencyInput = document.getElementById("frequencyInput");
+  const severityInput = document.getElementById("severityInput");
+  const alternativeInput = document.getElementById("alternativeInput");
 
-  // Custom option groups
-  setupOptionGroup('frequencyGroup', 'frequencyInput');
-  setupOptionGroup('severityGroup', 'severityInput');
-  setupOptionGroup('alternativeGroup', 'alternativeInput');
+  function applyOptionSelection(buttons, selectedButton) {
+    buttons.forEach(function (btn) {
+      btn.classList.remove("bg-black", "text-white");
+      btn.classList.add("bg-white", "text-black");
+    });
 
-  // Form submit
-  if (problemForm) {
-    problemForm.addEventListener('submit', handleFormSubmit);
+    selectedButton.classList.remove("bg-white", "text-black");
+    selectedButton.classList.add("bg-black", "text-white");
   }
 
-  // Example cards
-  setupExampleCards();
+  function setupOptionGroup(groupId, inputId) {
+    const group = document.getElementById(groupId);
+    const input = document.getElementById(inputId);
 
-  // Edition metadata
-  updateEditionMetadata();
-});
+    if (!group || !input) {
+      return;
+    }
 
+    const buttons = group.querySelectorAll(".option-btn");
 
-/**
- * Custom option group selector
- */
-function setupOptionGroup(groupId, inputId) {
-
-  const group = document.getElementById(groupId);
-  const hiddenInput = document.getElementById(inputId);
-
-  if (!group || !hiddenInput) return;
-
-  const buttons = group.querySelectorAll('.option-btn');
-
-  buttons.forEach(btn => {
-
-    btn.addEventListener('click', (e) => {
-
-      e.preventDefault();
-
-      buttons.forEach(b => {
-        b.classList.remove('selected', 'bg-black', 'text-white');
-        b.classList.add('bg-white', 'text-black');
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        applyOptionSelection(buttons, button);
+        input.value = button.dataset.value || "";
       });
+    });
+  }
 
-      btn.classList.add('selected', 'bg-black', 'text-white');
-      btn.classList.remove('bg-white', 'text-black');
+  setupOptionGroup("frequencyGroup", "frequencyInput");
+  setupOptionGroup("severityGroup", "severityInput");
+  setupOptionGroup("alternativeGroup", "alternativeInput");
 
-      hiddenInput.value = btn.dataset.value;
+  function getRecommendedAction(payload, priority) {
+    const category = payload.category || "community issue";
 
-      const errorMsg =
-        group.parentElement.querySelector('.error-message');
+    if (priority === "Critical") {
+      return [
+        "1. Deploy emergency response coordination with municipal leadership.",
+        "2. Activate temporary public services, alternative routes, and emergency communications.",
+        "3. Secure funding and begin repair or mitigation work within 24 hours."
+      ].join("\n");
+    }
 
-      if (errorMsg) {
-        errorMsg.classList.add('hidden');
+    if (priority === "High") {
+      return [
+        "1. Prioritize inspections and rapid intervention within the next 72 hours.",
+        "2. Coordinate local departments to reduce public risk and service disruption.",
+        "3. Prepare a community update and schedule follow-up monitoring."
+      ].join("\n");
+    }
+
+    if (priority === "Medium") {
+      return [
+        "1. Schedule regular municipal review and maintenance planning.",
+        "2. Assign community liaison updates to residents and stakeholders.",
+        "3. Review service alternatives and mitigation options before escalation."
+      ].join("\n");
+    }
+
+    return [
+      "1. Log the issue for routine maintenance and reporting.",
+      "2. Monitor conditions and collect citizen impact data.",
+      "3. Reassess the issue if the category or scale changes significantly."
+    ].join("\n");
+  }
+
+  function displayResult(result, payload) {
+    const resultFields = {
+      resProblemTitle: payload.problem || "Problem Title",
+      resCategoryHeader: payload.category || "Category",
+      resPeopleCount: String(result.people_affected || 0),
+      resPriorityScore: `${result.priority_score || 0}/100`,
+      resPriorityLevel: result.priority_level || "LOW PRIORITY",
+      resCategoryGrid: payload.category || "--",
+      resFrequency: payload.frequency || "--",
+      resSeverity: payload.severity || "--",
+      resAlternative: payload.alternative || "--",
+      resFactorSeverity: result.key_factors?.severity_impact || "Severity Impact",
+      resFactorFrequency: result.key_factors?.frequency_rate || "Frequency Rate",
+      resFactorPeople: result.key_factors?.population_affected || "Population Impact",
+      resFactorAlternative: result.key_factors?.alternative_status || "Alternative Status",
+      resAIExplanation: result.ai_explanation || "CivicPulse assessment is unavailable.",
+      resRecommendedAction: getRecommendedAction(payload, result.priority)
+    };
+
+    Object.entries(resultFields).forEach(function ([id, value]) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
       }
     });
 
-  });
-}
-
-
-/**
- * Handle form submission
- */
-async function handleFormSubmit(event) {
-
-  event.preventDefault();
-
-  const titleInput = document.getElementById('problemTitle');
-  const categoryInput = document.getElementById('problemCategory');
-  const peopleInput = document.getElementById('peopleAffected');
-  const frequencyInput = document.getElementById('frequencyInput');
-  const severityInput = document.getElementById('severityInput');
-  const alternativeInput = document.getElementById('alternativeInput');
-
-  let isValid = true;
-
-
-  // Validate title
-  if (!titleInput.value.trim()) {
-
-    showFieldError(
-      titleInput,
-      'Please specify the problem title.'
-    );
-
-    isValid = false;
-
-  } else {
-
-    clearFieldError(titleInput);
-
-  }
-
-
-  // Validate category
-  if (!categoryInput.value) {
-
-    showFieldError(
-      categoryInput,
-      'Select a category for this issue.'
-    );
-
-    isValid = false;
-
-  } else {
-
-    clearFieldError(categoryInput);
-
-  }
-
-
-  // Validate people affected
-  if (
-    !peopleInput.value ||
-    Number(peopleInput.value) < 1
-  ) {
-
-    showFieldError(
-      peopleInput,
-      'Enter a valid number of people affected.'
-    );
-
-    isValid = false;
-
-  } else {
-
-    clearFieldError(peopleInput);
-
-  }
-
-
-  // Validate frequency
-  if (!frequencyInput.value) {
-
-    showGroupError(
-      'frequencyGroup',
-      'Select frequency of occurrence.'
-    );
-
-    isValid = false;
-  }
-
-
-  // Validate severity
-  if (!severityInput.value) {
-
-    showGroupError(
-      'severityGroup',
-      'Select a severity level.'
-    );
-
-    isValid = false;
-  }
-
-
-  // Validate alternative
-  if (!alternativeInput.value) {
-
-    showGroupError(
-      'alternativeGroup',
-      'Select if an alternative is available.'
-    );
-
-    isValid = false;
-  }
-
-
-  // Stop if invalid
-  if (!isValid) {
-
-    const firstError = document.querySelector(
-      '.border-red-600, .error-message:not(.hidden)'
-    );
-
-    if (firstError) {
-
-      firstError.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-
-    }
-
-    return;
-  }
-
-
-  /**
-   * Data sent to Flask
-   */
-  const payload = {
-
-    title: titleInput.value.trim(),
-
-    problem: titleInput.value.trim(),
-
-    category: categoryInput.value,
-
-    people_affected: parseInt(
-      peopleInput.value,
-      10
-    ),
-
-    frequency: frequencyInput.value,
-
-    severity: severityInput.value,
-
-    alternative_available:
-      alternativeInput.value,
-
-    timestamp:
-      new Date().toISOString()
-  };
-
-
-  // Submit button
-  const submitBtn =
-    document.getElementById('submitBtn');
-
-  const originalBtnContent =
-    submitBtn.innerHTML;
-
-
-  submitBtn.disabled = true;
-
-  submitBtn.innerHTML = `
-    <span class="inline-flex items-center gap-2">
-
-      <svg
-        class="animate-spin h-5 w-5 text-white"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-
-        <circle
-          class="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          stroke-width="4"
-        ></circle>
-
-        <path
-          class="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        ></path>
-
-      </svg>
-
-      EVALUATING NEED DISPATCH...
-
-    </span>
-  `;
-
-
-  try {
-
-    // Send data to Flask
-    const resultData =
-      await submitToFlaskBackend(payload);
-
-
-    // Render result
-    renderPriorityResult(
-      resultData,
-      payload
-    );
-
-
-    // Restore button
-    submitBtn.disabled = false;
-
-    submitBtn.innerHTML =
-      originalBtnContent;
-
-
-    // Show result section
-    if (resultSection) {
-
-      resultSection.classList.remove('hidden');
-
-      resultSection.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-
-    }
-
-
-    // Show JSON payload
-    if (jsonPayloadCode) {
-
-      jsonPayloadCode.textContent =
-        JSON.stringify(
-          payload,
-          null,
-          2
-        );
-
-    }
-
-  } catch (err) {
-
-    console.error(
-      'Error in prioritization workflow:',
-      err
-    );
-
-    submitBtn.disabled = false;
-
-    submitBtn.innerHTML =
-      originalBtnContent;
-
-    alert(
-      'Unable to connect to CivicPulse backend. Please make sure the Flask server is running.'
-    );
-  }
-}
-
-
-/**
- * Send request to Flask backend
- */
-async function submitToFlaskBackend(payload) {
-
-  const response = await fetch(
-    'http://127.0.0.1:5000/api/prioritize',
-    {
-      method: 'POST',
-
-      headers: {
-        'Content-Type': 'application/json'
-      },
-
-      body: JSON.stringify(payload)
-    }
-  );
-
-
-  if (!response.ok) {
-
-    const errorData =
-      await response
-        .json()
-        .catch(() => ({}));
-
-    throw new Error(
-      errorData.error ||
-      `Flask server error: ${response.status}`
-    );
-  }
-
-
-  const backendData =
-    await response.json();
-
-
-  /**
-   * Convert Flask response
-   * into the format expected
-   * by the existing UI.
-   */
-
-  const score =
-    backendData.score;
-
-
-  let priorityLevel =
-    'LOW PRIORITY';
-
-  let badgeColorClass =
-    'bg-gray-200 text-gray-900 border-gray-900';
-
-
-  if (backendData.priority === 'Critical') {
-
-    priorityLevel =
-      'CRITICAL URGENCY';
-
-    badgeColorClass =
-      'bg-red-700 text-white border-black';
-
-  } else if (backendData.priority === 'High') {
-
-    priorityLevel =
-      'HIGH PRIORITY';
-
-    badgeColorClass =
-      'bg-amber-500 text-black border-black';
-
-  } else if (backendData.priority === 'Medium') {
-
-    priorityLevel =
-      'MODERATE PRIORITY';
-
-    badgeColorClass =
-      'bg-yellow-400 text-black border-black';
-  }
-
-
-  const factors =
-    backendData.key_factors;
-
-
-  return {
-
-    priority_level:
-      priorityLevel,
-
-    priority_score:
-      Math.round(
-        (score / 15) * 100
-      ),
-
-    badge_class:
-      badgeColorClass,
-
-    category:
-      backendData.category,
-
-    people_affected:
-      factors.people_affected,
-
-
-    key_factors: {
-
-      severity_impact:
-        `${factors.severity} Impact`,
-
-      frequency_rate:
-        `${factors.frequency} Interruption`,
-
-      population_affected:
-        `${factors.people_affected.toLocaleString()} Citizens Impacted`,
-
-      alternative_status:
-        factors.alternative_available === 'Yes'
-          ? 'Alternative Route/Source Exists'
-          : 'CRITICAL: No Viable Alternative Available'
-    },
-
-
-    /**
-     * Temporary explanation.
-     * Gemma will replace this later.
-     */
-    ai_explanation: backendData.ai_explanation,
-
-    /**
-     * Temporary recommendation.
-     * Later this can also be generated by Gemma.
-     */
-    recommended_action:
-
-      backendData.priority === 'Critical'
-
-        ? 'Immediate attention and resource allocation should be considered.'
-
-        : backendData.priority === 'High'
-
-          ? 'Schedule this issue for priority resolution.'
-
-          : 'Add this issue to the community maintenance queue.'
-  };
-}
-
-
-/**
- * Render priority result
- */
-function renderPriorityResult(
-  data,
-  payload
-) {
-
-  const priorityLevel =
-    document.getElementById(
-      'resPriorityLevel'
-    );
-
-  if (priorityLevel) {
-    priorityLevel.textContent =
-      data.priority_level;
-  }
-
-
-  const priorityScore =
-    document.getElementById(
-      'resPriorityScore'
-    );
-
-  if (priorityScore) {
-
-    priorityScore.textContent =
-      `${data.priority_score}/100`;
-  }
-
-
-  const levelBadge =
-    document.getElementById(
-      'resLevelBadge'
-    );
-
-  if (levelBadge) {
-
-    levelBadge.className =
-      `editorial-stamp px-3 py-1 text-sm font-bold border-2 ${data.badge_class}`;
-  }
-
-
-  const problemTitle =
-    document.getElementById(
-      'resProblemTitle'
-    );
-
-  if (problemTitle) {
-    problemTitle.textContent =
-      payload.title;
-  }
-
-
-  const categoryHeader =
-    document.getElementById(
-      'resCategoryHeader'
-    );
-
-  if (categoryHeader) {
-    categoryHeader.textContent =
-      payload.category;
-  }
-
-
-  const categoryGrid =
-    document.getElementById(
-      'resCategoryGrid'
-    );
-
-  if (categoryGrid) {
-    categoryGrid.textContent =
-      payload.category;
-  }
-
-
-  const peopleCount =
-    document.getElementById(
-      'resPeopleCount'
-    );
-
-  if (peopleCount) {
-
-    peopleCount.textContent =
-      payload.people_affected.toLocaleString();
-  }
-
-
-  const frequency =
-    document.getElementById(
-      'resFrequency'
-    );
-
-  if (frequency) {
-    frequency.textContent =
-      payload.frequency;
-  }
-
-
-  const severity =
-    document.getElementById(
-      'resSeverity'
-    );
-
-  if (severity) {
-    severity.textContent =
-      payload.severity;
-  }
-
-
-  const alternative =
-    document.getElementById(
-      'resAlternative'
-    );
-
-  if (alternative) {
-
-    const isAltYes =
-      payload.alternative_available === 'Yes' ||
-      payload.alternative_available === true;
-
-    alternative.textContent =
-      isAltYes
-        ? 'Yes (Available)'
-        : 'No (Critical Deficiency)';
-  }
-
-
-  // Key factors
-
-  const factorSeverity =
-    document.getElementById(
-      'resFactorSeverity'
-    );
-
-  if (factorSeverity) {
-
-    factorSeverity.textContent =
-      data.key_factors.severity_impact;
-  }
-
-
-  const factorFrequency =
-    document.getElementById(
-      'resFactorFrequency'
-    );
-
-  if (factorFrequency) {
-
-    factorFrequency.textContent =
-      data.key_factors.frequency_rate;
-  }
-
-
-  const factorPeople =
-    document.getElementById(
-      'resFactorPeople'
-    );
-
-  if (factorPeople) {
-
-    factorPeople.textContent =
-      data.key_factors.population_affected;
-  }
-
-
-  const factorAlternative =
-    document.getElementById(
-      'resFactorAlternative'
-    );
-
-  if (factorAlternative) {
-
-    factorAlternative.textContent =
-      data.key_factors.alternative_status;
-  }
-
-
-  // Explanation
-
-  const explanation =
-    document.getElementById(
-      'resAIExplanation'
-    );
-
-  if (explanation) {
-
-    explanation.textContent =
-      data.ai_explanation;
-  }
-
-
-  // Recommended action
-
-  const recommendedAction =
-    document.getElementById(
-      'resRecommendedAction'
-    );
-
-  if (recommendedAction) {
-
-    recommendedAction.innerText =
-      data.recommended_action;
-  }
-
-
-  // Timestamp
-
-  const timestamp =
-    document.getElementById(
-      'resTimestamp'
-    );
-
-  if (timestamp) {
-
-    timestamp.textContent =
-      new Date().toLocaleString(
-        'en-US',
-        {
-          dateStyle: 'full',
-          timeStyle: 'medium'
-        }
-      );
-  }
-}
-
-
-/**
- * Show field error
- */
-function showFieldError(
-  inputElem,
-  message
-) {
-
-  inputElem.classList.add(
-    'border-red-600'
-  );
-
-
-  let err =
-    inputElem.parentElement
-      .querySelector(
-        '.error-message'
+    const badge = document.getElementById("resLevelBadge");
+    if (badge) {
+      badge.classList.remove(
+        "bg-red-700",
+        "bg-amber-500",
+        "bg-yellow-400",
+        "bg-gray-200",
+        "text-white",
+        "text-black",
+        "text-gray-900"
       );
 
-
-  if (!err) {
-
-    err =
-      document.createElement(
-        'div'
-      );
-
-    err.className =
-      'error-message text-red-600 font-mono-meta text-xs mt-1 font-bold';
-
-    inputElem.parentElement
-      .appendChild(err);
-  }
-
-
-  err.textContent =
-    `▲ ${message}`;
-
-  err.classList.remove(
-    'hidden'
-  );
-}
-
-
-/**
- * Clear field error
- */
-function clearFieldError(
-  inputElem
-) {
-
-  inputElem.classList.remove(
-    'border-red-600'
-  );
-
-
-  const err =
-    inputElem.parentElement
-      .querySelector(
-        '.error-message'
-      );
-
-
-  if (err) {
-
-    err.classList.add(
-      'hidden'
-    );
-  }
-}
-
-
-/**
- * Show option group error
- */
-function showGroupError(
-  groupId,
-  message
-) {
-
-  const group =
-    document.getElementById(
-      groupId
-    );
-
-
-  if (!group) return;
-
-
-  let err =
-    group.parentElement
-      .querySelector(
-        '.error-message'
-      );
-
-
-  if (!err) {
-
-    err =
-      document.createElement(
-        'div'
-      );
-
-    err.className =
-      'error-message text-red-600 font-mono-meta text-xs mt-1 font-bold';
-
-    group.parentElement
-      .appendChild(err);
-  }
-
-
-  err.textContent =
-    `▲ ${message}`;
-
-  err.classList.remove(
-    'hidden'
-  );
-}
-
-
-/**
- * Example cards
- */
-function setupExampleCards() {
-
-  const examples = [
-
-    {
-      title:
-        'Contaminated Well Water in Ward 4 Market',
-
-      category:
-        'Water',
-
-      people:
-        2800,
-
-      frequency:
-        'Daily',
-
-      severity:
-        'High',
-
-      alternative:
-        'No'
-    },
-
-
-    {
-      title:
-        'Darkness Hazard on Main Commercial Boulevard',
-
-      category:
-        'Streetlights',
-
-      people:
-        950,
-
-      frequency:
-        'Daily',
-
-      severity:
-        'Medium',
-
-      alternative:
-        'Yes'
-    },
-
-
-    {
-      title:
-        'Severe Pothole Ridge on School Bus Transit Route',
-
-      category:
-        'Roads',
-
-      people:
-        3400,
-
-      frequency:
-        'Daily',
-
-      severity:
-        'High',
-
-      alternative:
-        'No'
-    },
-
-
-    {
-      title:
-        'Monsoon Overflow & Sewage Stagnation in South Suburb',
-
-      category:
-        'Drainage',
-
-      people:
-        4100,
-
-      frequency:
-        'Weekly',
-
-      severity:
-        'High',
-
-      alternative:
-        'No'
-    }
-
-  ];
-
-
-  document
-    .querySelectorAll(
-      '.load-example-btn'
-    )
-    .forEach(
-      (btn, index) => {
-
-        btn.addEventListener(
-          'click',
-          () => {
-
-            const data =
-              examples[index];
-
-            if (!data) return;
-
-
-            document.getElementById(
-              'problemTitle'
-            ).value =
-              data.title;
-
-
-            document.getElementById(
-              'problemCategory'
-            ).value =
-              data.category;
-
-
-            document.getElementById(
-              'peopleAffected'
-            ).value =
-              data.people;
-
-
-            selectOptionButton(
-              'frequencyGroup',
-              'frequencyInput',
-              data.frequency
-            );
-
-
-            selectOptionButton(
-              'severityGroup',
-              'severityInput',
-              data.severity
-            );
-
-
-            selectOptionButton(
-              'alternativeGroup',
-              'alternativeInput',
-              data.alternative
-            );
-
-
-            const form =
-              document.getElementById(
-                'submit-form'
-              );
-
-            if (form) {
-
-              form.scrollIntoView({
-                behavior: 'smooth'
-              });
-
-            }
-
-          }
-        );
-
-      }
-    );
-}
-
-
-/**
- * Select option button
- */
-function selectOptionButton(
-  groupId,
-  inputId,
-  value
-) {
-
-  const group =
-    document.getElementById(
-      groupId
-    );
-
-  const hiddenInput =
-    document.getElementById(
-      inputId
-    );
-
-
-  if (!group || !hiddenInput) {
-    return;
-  }
-
-
-  hiddenInput.value =
-    value;
-
-
-  const buttons =
-    group.querySelectorAll(
-      '.option-btn'
-    );
-
-
-  buttons.forEach(
-    btn => {
-
-      if (
-        btn.dataset.value === value
-      ) {
-
-        btn.classList.add(
-          'selected',
-          'bg-black',
-          'text-white'
-        );
-
-        btn.classList.remove(
-          'bg-white',
-          'text-black'
-        );
-
+      if (result.priority === "Critical") {
+        badge.classList.add("bg-red-700", "text-white");
+      } else if (result.priority === "High") {
+        badge.classList.add("bg-amber-500", "text-black");
+      } else if (result.priority === "Medium") {
+        badge.classList.add("bg-yellow-400", "text-black");
       } else {
-
-        btn.classList.remove(
-          'selected',
-          'bg-black',
-          'text-white'
-        );
-
-        btn.classList.add(
-          'bg-white',
-          'text-black'
-        );
+        badge.classList.add("bg-gray-200", "text-gray-900");
       }
-
     }
-  );
 
-
-  const err =
-    group.parentElement
-      .querySelector(
-        '.error-message'
-      );
-
-
-  if (err) {
-
-    err.classList.add(
-      'hidden'
-    );
+    if (resultSection) {
+      resultSection.classList.remove("hidden");
+      resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
-}
 
+  async function submitToFlaskBackend(payload) {
+    const response = await fetch("/api/prioritize", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
 
-/**
- * JSON modal
- */
-function toggleJsonModal() {
+    const data = await response.json();
 
-  const modal =
-    document.getElementById(
-      'jsonOutputModal'
-    );
+    if (!response.ok) {
+      throw new Error(data.error || "Backend error");
+    }
 
+    const score = Number(data.score) || 0;
+    let priorityLevel = "LOW PRIORITY";
 
-  if (modal) {
+    if (data.priority === "Critical") {
+      priorityLevel = "CRITICAL URGENCY";
+    } else if (data.priority === "High") {
+      priorityLevel = "HIGH PRIORITY";
+    } else if (data.priority === "Medium") {
+      priorityLevel = "MODERATE PRIORITY";
+    }
 
-    modal.classList.toggle(
-      'hidden'
-    );
+    const factors = data.key_factors || {};
+    const peopleAffected = Number(factors.people_affected) || 0;
+
+    return {
+      priority_level: priorityLevel,
+      priority_score: Math.round((score / 15) * 100),
+      raw_score: score,
+      priority: data.priority,
+      problem: data.problem,
+      category: data.category,
+      people_affected: peopleAffected,
+      frequency: factors.frequency || "",
+      severity: factors.severity || "",
+      alternative: factors.alternative_available || "",
+      key_factors: {
+        severity_impact: `${factors.severity || "Unknown"} Impact`,
+        frequency_rate: `${factors.frequency || "Unknown"} Interruption`,
+        population_affected: `${peopleAffected.toLocaleString()} Citizens Impacted`,
+        alternative_status: String(factors.alternative_available || "").toLowerCase() === "yes"
+          ? "Alternative Route/Source Exists"
+          : "CRITICAL: No Viable Alternative Available"
+      },
+      ai_explanation: data.ai_explanation || "CivicPulse has calculated the priority of this community issue."
+    };
   }
-}
-
-
-/**
- * Reset form and result
- */
-function resetFormAndResult() {
-
-  const form =
-    document.getElementById(
-      'problemForm'
-    );
-
 
   if (form) {
-    form.reset();
-  }
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
+      const problemTitle = document.getElementById("problemTitle");
+      const problemCategory = document.getElementById("problemCategory");
+      const peopleAffected = document.getElementById("peopleAffected");
 
-  document
-    .querySelectorAll(
-      '.option-btn'
-    )
-    .forEach(
-      btn => {
+      const problem = problemTitle ? problemTitle.value.trim() : "";
+      const category = problemCategory ? problemCategory.value : "";
+      const people = peopleAffected ? peopleAffected.value : "";
+      const selectedFrequency = frequencyInput ? frequencyInput.value : "";
+      const selectedSeverity = severityInput ? severityInput.value : "";
+      const selectedAlternative = alternativeInput ? alternativeInput.value : "";
 
-        btn.classList.remove(
-          'selected',
-          'bg-black',
-          'text-white'
-        );
-
-        btn.classList.add(
-          'bg-white',
-          'text-black'
-        );
+      if (!problem) {
+        alert("Please enter the problem title.");
+        return;
       }
-    );
 
+      if (!category) {
+        alert("Please select a category.");
+        return;
+      }
 
-  const frequency =
-    document.getElementById(
-      'frequencyInput'
-    );
+      if (!people || Number(people) < 1) {
+        alert("Please enter the number of people affected.");
+        return;
+      }
 
-  const severity =
-    document.getElementById(
-      'severityInput'
-    );
+      if (!selectedFrequency) {
+        alert("Please select the frequency.");
+        return;
+      }
 
-  const alternative =
-    document.getElementById(
-      'alternativeInput'
-    );
+      if (!selectedSeverity) {
+        alert("Please select the severity.");
+        return;
+      }
 
+      if (!selectedAlternative) {
+        alert("Please select whether an alternative is available.");
+        return;
+      }
 
-  if (frequency) {
-    frequency.value = '';
-  }
+      const payload = {
+        problem: problem,
+        category: category,
+        people_affected: Number(people),
+        frequency: selectedFrequency,
+        severity: selectedSeverity,
+        alternative_available: selectedAlternative
+      };
 
-  if (severity) {
-    severity.value = '';
-  }
+      const originalButtonHTML = submitBtn ? submitBtn.innerHTML : "";
 
-  if (alternative) {
-    alternative.value = '';
-  }
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "<span>ANALYZING...</span>";
+      }
 
+      try {
+        const result = await submitToFlaskBackend(payload);
+        displayResult(result, payload);
+        window.lastSubmittedPayload = payload;
+      } catch (error) {
+        console.error("CivicPulse Error:", error);
+        alert("Could not connect to the CivicPulse backend.\n\n" + (error.message || "Unknown error"));
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalButtonHTML;
+        }
 
-  document
-    .querySelectorAll(
-      '.error-message'
-    )
-    .forEach(
-      el => el.classList.add(
-        'hidden'
-      )
-    );
-
-
-  document
-    .querySelectorAll(
-      '.border-red-600'
-    )
-    .forEach(
-      el => el.classList.remove(
-        'border-red-600'
-      )
-    );
-
-
-  const resultSection =
-    document.getElementById(
-      'resultSection'
-    );
-
-
-  if (resultSection) {
-
-    resultSection.classList.add(
-      'hidden'
-    );
-  }
-
-
-  const formSection =
-    document.getElementById(
-      'submit-form'
-    );
-
-
-  if (formSection) {
-
-    formSection.scrollIntoView({
-      behavior: 'smooth'
+        if (typeof lucide !== "undefined") {
+          lucide.createIcons();
+        }
+      }
     });
   }
-}
 
+  function resetOptionButtons() {
+    document.querySelectorAll(".option-btn").forEach(function (btn) {
+      btn.classList.remove("bg-black", "text-white");
+      btn.classList.add("bg-white", "text-black");
+    });
 
-/**
- * Dynamic edition metadata
- */
-function updateEditionMetadata() {
-
-  const dateStr =
-    new Date().toLocaleDateString(
-      'en-US',
-      {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }
-    ).toUpperCase();
-
-
-  const headerDate =
-    document.getElementById(
-      'headerDateText'
-    );
-
-
-  if (headerDate) {
-
-    headerDate.textContent =
-      dateStr;
+    if (frequencyInput) frequencyInput.value = "";
+    if (severityInput) severityInput.value = "";
+    if (alternativeInput) alternativeInput.value = "";
   }
-}
+
+  window.resetFormAndResult = function () {
+    const formNode = document.getElementById("problemForm");
+    if (formNode) {
+      formNode.reset();
+    }
+
+    resetOptionButtons();
+
+    const fieldsToClear = [
+      "resProblemTitle",
+      "resCategoryHeader",
+      "resPeopleCount",
+      "resPriorityScore",
+      "resPriorityLevel",
+      "resCategoryGrid",
+      "resFrequency",
+      "resSeverity",
+      "resAlternative",
+      "resFactorSeverity",
+      "resFactorFrequency",
+      "resFactorPeople",
+      "resFactorAlternative",
+      "resAIExplanation",
+      "resRecommendedAction"
+    ];
+
+    fieldsToClear.forEach(function (id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = "";
+      }
+    });
+
+    if (resultSection) {
+      resultSection.classList.add("hidden");
+    }
+  };
+
+  window.toggleJsonModal = function () {
+    const existing = document.getElementById("jsonModal");
+    if (existing) {
+      existing.remove();
+      return;
+    }
+
+    const modal = document.createElement("div");
+    modal.id = "jsonModal";
+    modal.style.position = "fixed";
+    modal.style.inset = "0";
+    modal.style.background = "rgba(0,0,0,0.7)";
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal.style.zIndex = "1000";
+
+    const panel = document.createElement("div");
+    panel.style.width = "min(720px, 90vw)";
+    panel.style.maxHeight = "80vh";
+    panel.style.overflowY = "auto";
+    panel.style.background = "#fff";
+    panel.style.border = "2px solid #000";
+    panel.style.boxShadow = "0 20px 40px rgba(0,0,0,0.35)";
+    panel.style.padding = "24px";
+
+    const title = document.createElement("h3");
+    title.textContent = "JSON Payload Preview";
+    title.style.margin = "0 0 16px";
+    title.style.fontFamily = "sans-serif";
+
+    const payload = document.createElement("pre");
+    payload.textContent = JSON.stringify(window.lastSubmittedPayload || {}, null, 2);
+    payload.style.whiteSpace = "pre-wrap";
+    payload.style.wordBreak = "break-word";
+    payload.style.fontFamily = "monospace";
+    payload.style.fontSize = "12px";
+    payload.style.lineHeight = "1.6";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "Close";
+    closeBtn.style.marginTop = "16px";
+    closeBtn.style.padding = "10px 16px";
+    closeBtn.style.border = "2px solid #000";
+    closeBtn.style.background = "#000";
+    closeBtn.style.color = "#fff";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.style.fontWeight = "700";
+    closeBtn.addEventListener("click", function () {
+      modal.remove();
+    });
+
+    panel.appendChild(title);
+    panel.appendChild(payload);
+    panel.appendChild(closeBtn);
+    modal.appendChild(panel);
+    document.body.appendChild(modal);
+
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) {
+        modal.remove();
+      }
+    });
+  };
+
+  document.querySelectorAll(".load-example-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const preset = {
+        problem: "Drinking Water Contamination in Ward 4",
+        category: "Water",
+        people_affected: 2800,
+        frequency: "Daily",
+        severity: "High",
+        alternative_available: "No"
+      };
+
+      const title = document.getElementById("problemTitle");
+      const category = document.getElementById("problemCategory");
+      const people = document.getElementById("peopleAffected");
+
+      if (title) title.value = preset.problem;
+      if (category) category.value = preset.category;
+      if (people) people.value = preset.people_affected;
+
+      if (frequencyInput) frequencyInput.value = preset.frequency;
+      if (severityInput) severityInput.value = preset.severity;
+      if (alternativeInput) alternativeInput.value = preset.alternative_available;
+
+      document.querySelectorAll(".option-btn").forEach(function (btn) {
+        const isSelected = (btn.dataset.value || "") === preset.frequency ||
+          (btn.dataset.value || "") === preset.severity ||
+          (btn.dataset.value || "") === preset.alternative_available;
+
+        btn.classList.toggle("bg-black", isSelected);
+        btn.classList.toggle("text-white", isSelected);
+        btn.classList.toggle("bg-white", !isSelected);
+        btn.classList.toggle("text-black", !isSelected);
+      });
+    });
+  });
+});
