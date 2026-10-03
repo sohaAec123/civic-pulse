@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 from google import genai
@@ -144,10 +144,7 @@ Do not invent statistics or facts that were not provided.
 
 @app.route("/")
 def home():
-
-    return jsonify({
-        "message": "CivicPulse backend is running!"
-    })
+    return send_from_directory(".", "index.html")
 
 
 @app.route("/api/prioritize", methods=["POST"])
